@@ -1,0 +1,195 @@
+MDScreenManager:
+   LoginScreen:
+   RegisterScreen:
+   MDScreen:
+      name: 'main_interface'
+      MDBoxLayout:
+         orientation: 'vertical'
+         MDScreenManager:
+            id: tabs
+            Tab:
+               name: 'personal'
+               id: personal
+               scr_name: 'Personal'
+            Tab:
+               name: 'work'
+               id: work
+               scr_name: 'Work'
+            Tab:
+               name: 'study'
+               id: study
+               scr_name: 'Study'
+            Tab:
+               name: 'shopping'
+               id: shopping
+               scr_name: 'Shopping'
+         MDNavigationBar:
+            panel_color: '#d9eeef'
+            NavigationItemTemplate:
+               icon: 'account'
+               text: 'personal'
+               active: True
+               on_release: app.on_switch_tabs('personal')
+            NavigationItemTemplate:
+               icon: 'briefcase'
+               text: 'work'
+               on_release: app.on_switch_tabs('work')
+            NavigationItemTemplate:
+               icon: 'book'
+               text: 'study'
+               on_release: app.on_switch_tabs('study')
+            NavigationItemTemplate:
+               icon: 'shopping'
+               text: 'shopping'
+               on_release: app.on_switch_tabs('shopping')
+
+<NavigationItemTemplate>:
+   MDNavigationItemIcon:
+      icon: root.icon
+      theme_icon_color: 'Custom'
+      icon_color_active: '#052e5a'
+   MDNavigationItemLabel:
+      text: root.text
+      theme_text_color: 'Custom'
+      text_color_active: '#052e5a'
+
+<Credentials>:
+   mode: 'filled'
+   radius: [0, 0, 0, 0]
+   theme_bg_color: 'Custom'
+   fill_color_normal: 'white'
+   fill_color_focus: 'white'
+   MDTextFieldHintText:
+      text: root.hint_text
+
+<RegisterScreen>:
+   name: 'register'
+   md_bg_color: '#063970'
+   MDStackLayout:
+      spacing: '10dp'
+      padding: '20dp'
+      size_hint_y: None
+      height: self.minimum_height
+      pos_hint: {'center_y': .5}
+      Credentials:
+         id: new_username
+         hint_text: 'New Username'
+      Credentials:
+         id: new_password
+         hint_text: 'New Password'
+      MDButton:
+         on_press: root.register_user(new_username.text, new_password.text), new_username.reset(), new_password.reset()
+         MDButtonText:
+            text: "Register"
+      MDButton:
+         on_press: root.manager.current = 'login'
+         MDButtonText:
+            text: "Have an account?"
+
+<LoginScreen@MDScreen>:
+   name: 'login'
+   md_bg_color: '#063970'
+   MDStackLayout:
+      spacing: '10dp'
+      padding: '20dp'
+      size_hint_y: None
+      height: self.minimum_height
+      pos_hint: {'center_y': .5}
+      Credentials:
+         id: username
+         hint_text: 'Username'
+      Credentials:
+         id: password
+         password: True
+         hint_text: 'Password'
+      MDButton:
+         on_press: app.check_login(username.text, password.text), username.reset(), password.reset()
+         MDButtonText:
+            text: "Login"
+      MDButton:
+         on_press: root.manager.current = 'register'
+         MDButtonText:
+            text: "Create an account"
+
+<Tab>:
+   MDBoxLayout:
+      orientation: 'vertical'
+      md_bg_color: '#063970'
+      MDBoxLayout:
+         orientation: 'vertical'
+         md_bg_color: '#063970'
+         padding: ('10dp', '10dp', 0, 0)
+         size_hint_y: None
+         height: '40dp'
+         md_bg_color: '#3979bf'
+         MDLabel:
+            theme_text_color: 'Custom'
+            text: root.scr_name
+            text_color: 'white'
+      Activities:
+         id: activities
+         padding: ('5dp', '5dp', '5dp', '5dp')
+         spacing: '5dp'
+      MDBoxLayout:
+         size_hint_y: None
+         height: self.minimum_height
+         md_bg_color: 'white'
+         InputBox:
+            id: input
+         MDIconButton:
+            icon: 'microphone'
+            style: 'standard'
+            pos_hint: {'center_y': .5}
+            on_press: root.start_listening()
+            on_release: input.text = f'{input.text}{root.stop_listening()}'
+      MDButton:
+         on_release: activities.add_item(input.text), app.save_widget(input.text, app.root.ids.tabs.current), input.reset()
+         MDButtonText:
+            text: 'Add'
+
+<InputBox>:
+   mode: 'filled'
+   multiline: True
+   max_height: '200dp'
+   MDTextFieldHintText:
+      text: 'Enter new activity'
+
+<NewActivity>:
+   md_bg_color: '#38618d'
+   size_hint_y: None
+   height: self.minimum_height
+   MDLabel:
+      id: activity
+      text: root.content
+      theme_text_color: 'Custom'
+      text_color: 'white'
+      size_hint_y: None
+      height: '50dp'
+   MDIconButton:
+      on_release: app.show_alert(root)
+      icon: 'trash-can-outline'
+      style: 'standard'
+      pos_hint: {'center_y': .5}
+      theme_icon_color: 'Custom'
+      icon_color: 'white'
+
+<Confirm>:
+   size_hint: None, None
+   width: '300dp'
+   height: '100dp'
+   MDDialogSupportingText:
+      text: 'Are you sure you want to delete this activity?'
+   MDDialogButtonContainer:
+      margin: '50dp'
+      MDButton:
+         on_release: root.dismiss()
+         MDButtonText:
+            text: 'Cancel'
+            theme_text_color: 'Custom'
+            text_color: 'black'
+      MDButton:
+         on_release: app.delete_item(root.activity), root.dismiss()
+         MDButtonText:
+            text: 'Accept'
+            theme_text_color: 'Custom'
+            text_color: 'black'
